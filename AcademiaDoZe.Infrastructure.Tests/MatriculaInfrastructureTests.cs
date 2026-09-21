@@ -22,7 +22,7 @@ public class MatriculaInfrastructureTests : TestBase
     MatriculaPlano plano = MatriculaPlano.Mensal,
     DateOnly? dataInicio = null,
     MatriculaRestricoes restricoes = MatriculaRestricoes.None,
-    string obsRestricao = "",
+    string obsRestricao = "SQLServer",
     Arquivo? laudo = null)
     {
         var inicio = dataInicio ?? DateOnly.FromDateTime(DateTime.Today);
@@ -31,7 +31,7 @@ public class MatriculaInfrastructureTests : TestBase
             laudo = Arquivo.Criar(new byte[] { 1, 2, 3, 4 }).Value;
         }
         var matriculaResult = Matricula.Criar(
-    id: 0, aluno: aluno, plano: plano, dataInicio: inicio, objetivo: "Condicionamento Físico", restricoesMedicas: restricoes, laudoMedico: laudo, observacoesRestricoes: obsRestricao);
+    id: 0, aluno: aluno, plano: plano, dataInicio: inicio, objetivo: "Francis", restricoesMedicas: restricoes, laudoMedico: laudo, observacoesRestricoes: obsRestricao);
         if (matriculaResult.IsFailure)
         {
             throw new Exception($"Falha ao criar Matricula no Helper: {string.Join(", ", matriculaResult.Notifications.Select(n => n.Mensagem))}");
