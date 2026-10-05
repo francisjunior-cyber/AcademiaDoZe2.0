@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AcademiaDoZe.Presentation.AppMaui.Views.LogradouroListPage"
+             xmlns:vm="clr-namespace:AcademiaDoZe.Presentation.AppMaui.ViewModels"
+             xmlns:dto="clr-namespace:AcademiaDoZe.Application.DTOs;assembly=AcademiaDoZe.Application"
+             x:DataType="vm:LogradouroListViewModel"
+             Title="{Binding Title}">
+    <Grid RowDefinitions="*">
+        <CollectionView ItemsSource="{Binding Logradouros}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="dto:LogradouroDto">
+                    <Border Style="{StaticResource CardBorder}" Margin="10">
+                        <Grid ColumnDefinitions="*,Auto,Auto">
+                            <StackLayout>
+                                <Label Text="{Binding Nome}" FontAttributes="Bold"/>
+                                <Label Text="{Binding Cep}"/>
+                                <Label Text="{Binding Cidade}"/>
+                            </StackLayout>
+                            <Button Grid.Column="1" Text="Editar" Style="{StaticResource ButtonSmall}" Clicked="OnEditButtonClicked"/>
+                            <Button Grid.Column="2" Text="Excluir" Style="{StaticResource ButtonDanger}" Clicked="OnDeleteButtonClicked"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        <Button Text="+" Command="{Binding AddLogradouroCommand}" Style="{StaticResource ButtonPrimary}" WidthRequest="56" HeightRequest="56" HorizontalOptions="End" VerticalOptions="End" Margin="20"/>
+    </Grid>
+</ContentPage>

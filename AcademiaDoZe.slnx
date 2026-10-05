@@ -6,4 +6,5 @@
   <Project Path="AcademiaDoZe.Application/AcademiaDoZe.Application.csproj" Id="0f93959b-4351-4ef1-bde6-09dfda0043de" />
   <Project Path="AcademiaDoZe.Domain/AcademiaDoZe.Domain.csproj" />
   <Project Path="AcademiaDoZe.Infrastructure/AcademiaDoZe.Infrastructure.csproj" Id="6aa51a25-bad1-4bba-ba36-9707b7e6d6d5" />
+  <Project Path="AcademiaDoZe.Presentation.AppMaui/AcademiaDoZe.Presentation.AppMaui.csproj" Id="cc2cec4a-70ca-475a-bef6-ad4225a64813" />
 </Solution>
