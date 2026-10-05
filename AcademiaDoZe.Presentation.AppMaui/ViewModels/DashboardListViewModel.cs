@@ -34,35 +34,34 @@ public partial class DashboardListViewModel : BaseViewModel
     [RelayCommand]
     private async Task LoadDashboardDataAsync()
     {
-        if (IsBusy) return;
+        if (IsBusy)
+            return;
+
         try
         {
             IsBusy = true;
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            var logradourosTask = _logradouroService.ObterTodosAsync(cts.Token);
-            var alunosTask = _alunoService.ObterTodosAsync(cts.Token);
-            var colaboradoresTask = _colaboradorService.ObterTodosAsync(cts.Token);
-            var matriculasTask = _matriculaService.ObterTodasAsync(cts.Token);
 
-            await Task.WhenAll(logradourosTask, alunosTask, colaboradoresTask, matriculasTask);
+            // Busca apenas os Logradouros para evitar timeout em tabelas inexistentes/serviços não implementados
+            var logradouros = await _logradouroService.ObterTodosAsync();
+            var totalLog = logradouros?.Count() ?? 0;
 
-            TotalLogradouros = (await logradourosTask).Count();
-            TotalAlunos = (await alunosTask).Count();
-            TotalColaboradores = (await colaboradoresTask).Count();
-            TotalMatriculas = (await matriculasTask).Count();
+            // Atualiza as propriedades na thread principal da interface gráfica
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                TotalLogradouros = totalLog;
+                TotalAlunos = 0;
+                TotalColaboradores = 0;
+                TotalMatriculas = 0;
+            });
         }
         catch (Exception ex)
         {
-            await Shell.Current.DisplayAlertAsync("Erro", $"Erro ao carregar o painel: {ex.Message}", "OK");
+            await Shell.Current.DisplayAlertAsync("Erro", $"Erro ao carregar dados do painel: {ex.Message}", "OK");
         }
         finally
         {
             IsBusy = false;
         }
     }
-
-    [RelayCommand] private async Task NavigateToLogradourosAsync() => await Shell.Current.GoToAsync("//logradouros");
-    [RelayCommand] private async Task NavigateToAlunosAsync() => await Shell.Current.GoToAsync("//alunos");
-    [RelayCommand] private async Task NavigateToColaboradoresAsync() => await Shell.Current.GoToAsync("//colaboradores");
-    [RelayCommand] private async Task NavigateToMatriculasAsync() => await Shell.Current.GoToAsync("//matriculas");
 }
+

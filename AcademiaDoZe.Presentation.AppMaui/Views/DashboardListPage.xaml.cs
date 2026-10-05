@@ -13,7 +13,9 @@ public partial class DashboardListPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        if (BindingContext is DashboardListViewModel vm)
-            await vm.LoadDashboardDataCommand.ExecuteAsync(null);
+        if (BindingContext is DashboardListViewModel viewModel)
+        {
+            await viewModel.LoadDashboardDataCommand.ExecuteAsync(null);
+        }
     }
 }
