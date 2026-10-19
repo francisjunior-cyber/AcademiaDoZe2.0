@@ -7,6 +7,9 @@ public partial class AppShell : Shell
     public AppShell()
     {
         InitializeComponent();
-        Routing.RegisterRoute("logradouro", typeof(LogradouroPage));
+
+        // Registrar rota para Colaborador
+        Routing.RegisterRoute("colaborador", typeof(ColaboradorPage));
+        Routing.RegisterRoute("aluno", typeof(AlunoPage));
     }
 }

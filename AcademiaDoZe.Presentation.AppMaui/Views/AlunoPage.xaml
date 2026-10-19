@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AcademiaDoZe.Presentation.AppMaui.Views.AlunoPage"
+             Title="{Binding Title}">
+
+    <ScrollView Padding="20">
+        <VerticalStackLayout Spacing="15">
+
+            <!-- Dados Pessoais -->
+            <Border Padding="15" StrokeShape="RoundRectangle 10" BackgroundColor="#1E1E1E">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Dados Pessoais" FontSize="18" FontAttributes="Bold" TextColor="#A855F7" />
+
+                    <StackLayout Spacing="5">
+                        <Label Text="Nome" />
+                        <Entry Text="{Binding Aluno.Nome}" Placeholder="Nome completo" ClearButtonVisibility="WhileEditing" />
+                    </StackLayout>
+
+                    <StackLayout Spacing="5">
+                        <Label Text="CPF" />
+                        <Entry Text="{Binding Aluno.Cpf}" Placeholder="000.000.000-00" Keyboard="Numeric" MaxLength="14" ClearButtonVisibility="WhileEditing" />
+                    </StackLayout>
+
+                    <StackLayout Spacing="5">
+                        <Label Text="Data de Nascimento" />
+                        <DatePicker Date="{Binding SelectedDataNascimento}" Format="dd/MM/yyyy" MinimumDate="01/01/1920" />
+                    </StackLayout>
+
+                    <StackLayout Spacing="5">
+                        <Label Text="Telefone" />
+                        <Entry Text="{Binding Aluno.Telefone}" Placeholder="(00) 00000-0000" Keyboard="Telephone" ClearButtonVisibility="WhileEditing" />
+                    </StackLayout>
+
+                    <StackLayout Spacing="5">
+                        <Label Text="Email" />
+                        <Entry Text="{Binding Aluno.Email}" Placeholder="exemplo@email.com" Keyboard="Email" MaxLength="100" ClearButtonVisibility="WhileEditing" />
+                    </StackLayout>
+
+                    <!-- Campos de Senha -->
+                    <StackLayout Spacing="5">
+                        <Label Text="Senha" />
+                        <Entry Text="{Binding Aluno.Senha}" Placeholder="Digite a senha..." IsPassword="True" MaxLength="50" ClearButtonVisibility="WhileEditing" />
+                    </StackLayout>
+
+                    <StackLayout Spacing="5">
+                        <Label Text="Confirmar Senha" />
+                        <Entry Text="{Binding ConfirmarSenha}" Placeholder="Confirme a senha..." IsPassword="True" MaxLength="50" ClearButtonVisibility="WhileEditing" />
+                    </StackLayout>
+
+                    <!-- Foto -->
+                    <StackLayout Spacing="5">
+                        <Label Text="Foto" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
+                            <Button Grid.Column="0" Text="Câmera" Command="{Binding TirarFotoCommand}" BackgroundColor="#6B21A8" TextColor="White" />
+                            <Button Grid.Column="1" Text="Galeria" Command="{Binding SelecionarFotoCommand}" BackgroundColor="#374151" TextColor="White" />
+                        </Grid>
+                    </StackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Endereço -->
+            <Border Padding="15" StrokeShape="RoundRectangle 10" BackgroundColor="#1E1E1E">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Endereço" FontSize="18" FontAttributes="Bold" TextColor="#A855F7" />
+
+                    <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
+                        <StackLayout Grid.Column="0" Spacing="5">
+                            <Label Text="CEP" />
+                            <Entry Text="{Binding Aluno.Endereco.Cep}" Placeholder="00000-000" Keyboard="Numeric" MaxLength="9" />
+                        </StackLayout>
+                        <Button Grid.Column="1" Text="Buscar CEP" Command="{Binding BuscarCepCommand}" VerticalOptions="End" BackgroundColor="#6B21A8" TextColor="White" />
+                    </Grid>
+
+                    <StackLayout Spacing="5">
+                        <Label Text="Logradouro" />
+                        <Entry Text="{Binding Aluno.Endereco.Nome}" Placeholder="Rua / Avenida..." />
+                    </StackLayout>
+
+                    <StackLayout Spacing="5">
+                        <Label Text="Bairro" />
+                        <Entry Text="{Binding Aluno.Endereco.Bairro}" Placeholder="Bairro" />
+                    </StackLayout>
+
+                    <Grid ColumnDefinitions="*, *" ColumnSpacing="10">
+                        <StackLayout Grid.Column="0" Spacing="5">
+                            <Label Text="Cidade" />
+                            <Entry Text="{Binding Aluno.Endereco.Cidade}" Placeholder="Cidade" />
+                        </StackLayout>
+                        <StackLayout Grid.Column="1" Spacing="5">
+                            <Label Text="UF" />
+                            <Entry Text="{Binding Aluno.Endereco.Estado}" Placeholder="UF" MaxLength="2" />
+                        </StackLayout>
+                    </Grid>
+
+                    <StackLayout Spacing="5">
+                        <Label Text="Número" />
+                        <Entry Text="{Binding Aluno.Numero}" Placeholder="Nº" />
+                    </StackLayout>
+
+                    <StackLayout Spacing="5">
+                        <Label Text="Complemento" />
+                        <Entry Text="{Binding Aluno.Complemento}" Placeholder="Apto, Casa, Bloco..." />
+                    </StackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Botões de Ação -->
+            <Grid ColumnDefinitions="*, *" ColumnSpacing="10" Margin="0,10,0,20">
+                <Button Grid.Column="0" Text="Cancelar" Command="{Binding CancelarCommand}" BackgroundColor="#374151" TextColor="White" />
+                <Button Grid.Column="1" Text="Salvar" Command="{Binding SalvarCommand}" BackgroundColor="#6B21A8" TextColor="White" />
+            </Grid>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
