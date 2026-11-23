@@ -1,4 +1,5 @@
-﻿using AcademiaDoZe.Application.DTOs;
+﻿// Francis Miguel Kuhl Schweitzer Junior
+using AcademiaDoZe.Application.DTOs;
 using AcademiaDoZe.Application.Enums;
 using AcademiaDoZe.Application.Interfaces;
 using CommunityToolkit.Mvvm.Input;
@@ -95,7 +96,7 @@ public partial class ColaboradorListViewModel : BaseViewModel
                 OnPropertyChanged(nameof(Colaboradores));
             });
 
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             var colaboradoresList = await _colaboradorService.ObterTodosAsync(cts.Token);
 
             if (colaboradoresList != null)
@@ -140,7 +141,7 @@ public partial class ColaboradorListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             bool success = await _colaboradorService.RemoverAsync(colaborador.Id, cts.Token);
 
             if (success)

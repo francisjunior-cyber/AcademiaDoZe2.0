@@ -1,56 +1,80 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<!-- Francis Miguel Kuhl Schweitzer Junior -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="AcademiaDoZe.Presentation.AppMaui.Views.DashboardListPage"
              Title="Dashboard">
 
-    <!-- Único elemento raiz permitido dentro do ContentPage -->
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="25" HorizontalOptions="FillAndExpand">
+        <VerticalStackLayout Padding="20" Spacing="25" HorizontalOptions="Fill">
 
-            <!-- Logotipo e Título -->
-            <Image Source="academiadoze.png" 
-                   HeightRequest="150" 
-                   HorizontalOptions="Center" />
+            <!-- Logotipo em container claro para não ficar recortado no Modo Escuro -->
+            <Border StrokeShape="RoundRectangle 16"
+                    StrokeThickness="0"
+                    Padding="10"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#F3F4F6}"
+                    HorizontalOptions="Center">
+                <Image Source="academiadoze.png"
+                       HeightRequest="150"
+                       Aspect="AspectFit"
+                       HorizontalOptions="Center" />
+            </Border>
 
-            <Label Text="Academia do Zé" 
-                   FontSize="32" 
-                   TextColor="#1e1e24" 
-                   HorizontalOptions="Center" 
-                   Margin="0,0,0,20"/>
+            <VerticalStackLayout Spacing="8" Margin="0,0,0,10">
+                <Label Text="Academia do Zé"
+                       FontSize="32"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}"
+                       HorizontalOptions="Center" />
+
+                <!-- Destaque obrigatório do autor -->
+                <Label Text="Desenvolvido por: Francis Miguel Kuhl Schweitzer Junior"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"
+                       TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
 
             <!-- Grid contendo os 4 Cards alinhados lado a lado -->
             <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto" ColumnSpacing="15" RowSpacing="15">
 
                 <!-- Card Logradouros -->
-                <Border Grid.Row="0" Grid.Column="0" BackgroundColor="#E1DFF5" StrokeShape="RoundRectangle 12" Padding="20">
+                <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardBorder}" Padding="20">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateCommand}" CommandParameter="//logradouros" />
+                    </Border.GestureRecognizers>
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="{Binding TotalLogradouros}" FontSize="28" TextColor="#333333" HorizontalOptions="Center" />
-                        <Label Text="Logradouros" TextColor="#555555" HorizontalOptions="Center" />
+                        <Label Text="{Binding TotalLogradouros}" FontSize="28" TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" HorizontalOptions="Center" />
+                        <Label Text="Logradouros" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray100}}" HorizontalOptions="Center" />
                     </VerticalStackLayout>
                 </Border>
 
                 <!-- Card Alunos -->
-                <Border Grid.Row="0" Grid.Column="1" BackgroundColor="#E1DFF5" StrokeShape="RoundRectangle 12" Padding="20">
+                <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource CardBorder}" Padding="20">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateCommand}" CommandParameter="//alunos" />
+                    </Border.GestureRecognizers>
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="{Binding TotalAlunos}" FontSize="28" TextColor="#333333" HorizontalOptions="Center" />
-                        <Label Text="Alunos" TextColor="#555555" HorizontalOptions="Center" />
+                        <Label Text="{Binding TotalAlunos}" FontSize="28" TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" HorizontalOptions="Center" />
+                        <Label Text="Alunos" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray100}}" HorizontalOptions="Center" />
                     </VerticalStackLayout>
                 </Border>
 
                 <!-- Card Colaboradores -->
-                <Border Grid.Row="1" Grid.Column="0" BackgroundColor="#E1DFF5" StrokeShape="RoundRectangle 12" Padding="20">
+                <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource CardBorder}" Padding="20">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding NavigateCommand}" CommandParameter="//colaboradores" />
+                    </Border.GestureRecognizers>
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="{Binding TotalColaboradores}" FontSize="28" TextColor="#333333" HorizontalOptions="Center" />
-                        <Label Text="Colaboradores" TextColor="#555555" HorizontalOptions="Center" />
+                        <Label Text="{Binding TotalColaboradores}" FontSize="28" TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" HorizontalOptions="Center" />
+                        <Label Text="Colaboradores" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray100}}" HorizontalOptions="Center" />
                     </VerticalStackLayout>
                 </Border>
 
                 <!-- Card Matrículas -->
-                <Border Grid.Row="1" Grid.Column="1" BackgroundColor="#E1DFF5" StrokeShape="RoundRectangle 12" Padding="20">
+                <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource CardBorder}" Padding="20">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="{Binding TotalMatriculas}" FontSize="28" TextColor="#333333" HorizontalOptions="Center" />
-                        <Label Text="Matrículas" TextColor="#555555" HorizontalOptions="Center" />
+                        <Label Text="{Binding TotalMatriculas}" FontSize="28" TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource White}}" HorizontalOptions="Center" />
+                        <Label Text="Matrículas" TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray100}}" HorizontalOptions="Center" />
                     </VerticalStackLayout>
                 </Border>
 

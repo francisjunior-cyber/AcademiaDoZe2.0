@@ -1,122 +1,127 @@
-﻿using AcademiaDoZe.Application.DTOs;
+﻿// Francis Miguel Kuhl Schweitzer Junior
+using AcademiaDoZe.Application.DTOs;
 using AcademiaDoZe.Application.Interfaces;
-using AcademiaDoZe.Domain.Entities;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Media;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace AcademiaDoZe.Presentation.AppMaui.ViewModels;
 
-[QueryProperty(nameof(Aluno), "aluno")]
-[QueryProperty(nameof(Aluno), "Aluno")]
-[QueryProperty(nameof(AlunoId), "id")]
 [QueryProperty(nameof(AlunoId), "Id")]
-public partial class AlunoViewModel : ObservableObject, IQueryAttributable
+public partial class AlunoViewModel : BaseViewModel
 {
     private readonly IAlunoService _alunoService;
     private readonly ILogradouroService _logradouroService;
 
-    [ObservableProperty]
-    private string _title = "Novo Aluno";
-
-    [ObservableProperty]
     private AlunoDto _aluno = CriarAlunoPadrao();
+    public AlunoDto Aluno
+    {
+        get => _aluno;
+        set => SetProperty(ref _aluno, value);
+    }
 
-    [ObservableProperty]
     private int _alunoId;
+    public int AlunoId
+    {
+        get => _alunoId;
+        set => SetProperty(ref _alunoId, value);
+    }
 
-    [ObservableProperty]
+    private bool _isEditMode;
+    public bool IsEditMode
+    {
+        get => _isEditMode;
+        set => SetProperty(ref _isEditMode, value);
+    }
+
     private string _confirmarSenha = string.Empty;
+    public string ConfirmarSenha
+    {
+        get => _confirmarSenha;
+        set => SetProperty(ref _confirmarSenha, value);
+    }
 
-    [ObservableProperty]
     private DateTime _selectedDataNascimento = DateTime.Today.AddYears(-18);
+    public DateTime SelectedDataNascimento
+    {
+        get => _selectedDataNascimento;
+        set => SetProperty(ref _selectedDataNascimento, value);
+    }
 
     public AlunoViewModel(IAlunoService alunoService, ILogradouroService logradouroService)
     {
         _alunoService = alunoService;
         _logradouroService = logradouroService;
-    }
-
-    /// <summary>
-    /// Executado automaticamente quando o objeto Aluno é atribuído na navegação
-    /// </summary>
-    partial void OnAlunoChanged(AlunoDto value)
-    {
-        if (value != null && value.Id > 0)
-        {
-            _alunoId = value.Id;
-            Title = "Editar Aluno";
-            ConfirmarSenha = value.Senha ?? string.Empty;
-            if (value.DataNascimento != default)
-            {
-                SelectedDataNascimento = value.DataNascimento.ToDateTime(TimeOnly.MinValue);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Executado automaticamente quando o AlunoId é atribuído na navegação
-    /// </summary>
-    partial void OnAlunoIdChanged(int value)
-    {
-        if (value > 0 && (Aluno == null || Aluno.Id != value))
-        {
-            Title = "Editar Aluno";
-            _ = CarregarAlunoPorIdAsync(value);
-        }
-    }
-
-    /// <summary>
-    /// Intercepta dinamicamente qualquer parâmetro enviado na navegação
-    /// </summary>
-    public void ApplyQueryAttributes(IDictionary<string, object> query)
-    {
-        if (query == null || query.Count == 0) return;
-
-        foreach (var kvp in query)
-        {
-            // Se foi passado o objeto AlunoDto
-            if (kvp.Value is AlunoDto alunoDto && alunoDto.Id > 0)
-            {
-                Aluno = alunoDto;
-                return;
-            }
-
-            // Se foi passado um ID (inteiro ou string)
-            if (kvp.Value != null && int.TryParse(kvp.Value.ToString(), out int id) && id > 0)
-            {
-                AlunoId = id;
-                return;
-            }
-        }
+        Title = "Detalhes do Aluno";
     }
 
     public async Task InitializeAsync()
     {
-        if (AlunoId > 0 && (Aluno == null || Aluno.Id == 0))
+        if (AlunoId > 0)
         {
-            await CarregarAlunoPorIdAsync(AlunoId);
+            IsEditMode = true;
+            Title = "Editar Aluno";
+
+            // Evita sobrescrever alterações já feitas quando a página reaparece
+            if (Aluno.Id != AlunoId)
+            {
+                ConfirmarSenha = string.Empty;
+                await LoadAlunoAsync();
+            }
+        }
+        else
+        {
+            IsEditMode = false;
+            Title = "Novo Aluno";
         }
     }
 
-    private async Task CarregarAlunoPorIdAsync(int id)
+    [RelayCommand]
+    public async Task LoadAlunoAsync()
     {
+        if (AlunoId <= 0) return;
+
         try
         {
-            var aluno = await _alunoService.ObterPorIdAsync(id);
-            if (aluno != null)
+            IsBusy = true;
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            var alunoData = await _alunoService.ObterPorIdAsync(AlunoId, cts.Token);
+
+            if (alunoData != null)
             {
-                Aluno = aluno;
+                alunoData.Endereco ??= new LogradouroDto
+                {
+                    Cep = string.Empty,
+                    Nome = string.Empty,
+                    Bairro = string.Empty,
+                    Cidade = string.Empty,
+                    Estado = string.Empty,
+                    Pais = "Brasil"
+                };
+
+                alunoData.Senha = string.Empty;
+                ConfirmarSenha = string.Empty;
+                Aluno = alunoData;
+
+                if (alunoData.DataNascimento != default)
+                {
+                    SelectedDataNascimento = alunoData.DataNascimento.ToDateTime(TimeOnly.MinValue);
+                }
             }
+            else
+            {
+                await Shell.Current.DisplayAlertAsync("Aviso", "Aluno não encontrado.", "OK");
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            await Shell.Current.DisplayAlertAsync("Tempo Esgotado", "O carregamento do aluno expirou. Verifique a conexão.", "OK");
         }
         catch (Exception ex)
         {
             await Shell.Current.DisplayAlertAsync("Erro", $"Erro ao carregar aluno: {ex.Message}", "OK");
+        }
+        finally
+        {
+            IsBusy = false;
         }
     }
 
@@ -144,6 +149,8 @@ public partial class AlunoViewModel : ObservableObject, IQueryAttributable
     [RelayCommand]
     private async Task SalvarAsync()
     {
+        if (IsBusy) return;
+
         try
         {
             if (string.IsNullOrWhiteSpace(Aluno.Nome))
@@ -158,17 +165,21 @@ public partial class AlunoViewModel : ObservableObject, IQueryAttributable
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(Aluno.Senha))
+            // Senha obrigatória no cadastro; na edição, vazia mantém a senha atual (o serviço preserva o hash)
+            bool senhaInformada = !string.IsNullOrWhiteSpace(Aluno.Senha);
+            if (!IsEditMode && !senhaInformada)
             {
                 await Shell.Current.DisplayAlertAsync("Validação", "A senha é obrigatória.", "OK");
                 return;
             }
 
-            if (Aluno.Senha != ConfirmarSenha)
+            if ((senhaInformada || !string.IsNullOrWhiteSpace(ConfirmarSenha)) && Aluno.Senha != ConfirmarSenha)
             {
                 await Shell.Current.DisplayAlertAsync("Validação", "As senhas não coincidem.", "OK");
                 return;
             }
+
+            IsBusy = true;
 
             // Garante que o Logradouro existe no banco de dados para evitar erro de Foreign Key (FK)
             if (Aluno.Endereco != null && Aluno.Endereco.Id == 0)
@@ -192,8 +203,9 @@ public partial class AlunoViewModel : ObservableObject, IQueryAttributable
             }
 
             Aluno.DataNascimento = DateOnly.FromDateTime(SelectedDataNascimento);
+            Aluno.Senha = senhaInformada ? Aluno.Senha : null;
 
-            if (Aluno.Id == 0)
+            if (!IsEditMode)
             {
                 await _alunoService.AdicionarAsync(Aluno);
                 await Shell.Current.DisplayAlertAsync("Sucesso", "Aluno cadastrado com sucesso!", "OK");
@@ -210,6 +222,10 @@ public partial class AlunoViewModel : ObservableObject, IQueryAttributable
         {
             await Shell.Current.DisplayAlertAsync("Erro", $"Erro ao salvar aluno: {ex.Message}", "OK");
         }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     [RelayCommand]
@@ -225,7 +241,7 @@ public partial class AlunoViewModel : ObservableObject, IQueryAttributable
         {
             if (MediaPicker.Default.IsCaptureSupported)
             {
-                FileResult photo = await MediaPicker.Default.CapturePhotoAsync();
+                FileResult? photo = await MediaPicker.Default.CapturePhotoAsync();
                 if (photo != null)
                 {
                     using Stream sourceStream = await photo.OpenReadAsync();
@@ -255,7 +271,7 @@ public partial class AlunoViewModel : ObservableObject, IQueryAttributable
     {
         try
         {
-            FileResult photo = await MediaPicker.Default.PickPhotoAsync();
+            FileResult? photo = await MediaPicker.Default.PickPhotoAsync();
             if (photo != null)
             {
                 using Stream sourceStream = await photo.OpenReadAsync();

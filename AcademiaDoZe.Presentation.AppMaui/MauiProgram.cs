@@ -1,4 +1,5 @@
-﻿using AcademiaDoZe.Presentation.AppMaui.ViewModels;
+﻿// Francis Miguel Kuhl Schweitzer Junior
+using AcademiaDoZe.Presentation.AppMaui.ViewModels;
 using AcademiaDoZe.Presentation.AppMaui.Views;
 using Microsoft.Extensions.Logging;
 using AcademiaDoZe.Presentation.AppMaui.Configuration;
@@ -39,6 +40,14 @@ public static class MauiProgram
         builder.Services.AddTransient<AlunoViewModel>();
         builder.Services.AddTransient<AlunoListPage>();
         builder.Services.AddTransient<AlunoPage>();
+        // Registrar ViewModels e Views de Matrícula
+        builder.Services.AddTransient<MatriculaListViewModel>();
+        builder.Services.AddTransient<MatriculaViewModel>();
+        builder.Services.AddTransient<MatriculaListPage>();
+        builder.Services.AddTransient<MatriculaPage>();
+        // Registrar ViewModel e View do Controle de Acesso (catraca)
+        builder.Services.AddTransient<AcessoViewModel>();
+        builder.Services.AddTransient<AcessoPage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

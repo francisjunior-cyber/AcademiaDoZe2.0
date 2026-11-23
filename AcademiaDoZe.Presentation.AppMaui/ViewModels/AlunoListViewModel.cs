@@ -1,4 +1,5 @@
-﻿using AcademiaDoZe.Application.DTOs;
+﻿// Francis Miguel Kuhl Schweitzer Junior
+using AcademiaDoZe.Application.DTOs;
 using AcademiaDoZe.Application.Interfaces;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections.ObjectModel;
@@ -73,6 +74,80 @@ public partial class AlunoListViewModel : BaseViewModel
     }
 
     [RelayCommand]
+    private async Task SearchAlunosAsync()
+    {
+        if (IsBusy) return;
+
+        var texto = SearchText?.Trim() ?? string.Empty;
+        if (string.IsNullOrEmpty(texto))
+        {
+            await LoadAlunosAsync();
+            return;
+        }
+
+        try
+        {
+            IsBusy = true;
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            IEnumerable<AlunoDto> resultados = [];
+
+            if (SelectedFilterType == "Id")
+            {
+                if (int.TryParse(texto, out int id))
+                {
+                    var aluno = await _alunoService.ObterPorIdAsync(id, cts.Token);
+                    if (aluno != null) resultados = [aluno];
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlertAsync("Aviso", "Para busca por ID, informe um número válido.", "OK");
+                    return;
+                }
+            }
+            else if (SelectedFilterType == "CPF")
+            {
+                var cpf = new string([.. texto.Where(char.IsDigit)]);
+                if (cpf.Length != 11)
+                {
+                    await Shell.Current.DisplayAlertAsync("Aviso", "O CPF deve conter exatamente 11 dígitos numéricos.", "OK");
+                    return;
+                }
+                var aluno = await _alunoService.ObterPorCpfAsync(cpf, cts.Token);
+                if (aluno != null) resultados = [aluno];
+            }
+            else if (SelectedFilterType == "Email")
+            {
+                var aluno = await _alunoService.ObterPorEmailAsync(texto, cts.Token);
+                if (aluno != null) resultados = [aluno];
+            }
+            else
+            {
+                resultados = await _alunoService.ObterPorNomeAsync(texto, cts.Token) ?? [];
+            }
+
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                Alunos.Clear();
+                foreach (var item in resultados) Alunos.Add(item);
+                OnPropertyChanged(nameof(Alunos));
+            });
+        }
+        catch (OperationCanceledException)
+        {
+            await Shell.Current.DisplayAlertAsync("Tempo Esgotado", "A busca de alunos expirou. Verifique a conexão.", "OK");
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlertAsync("Erro", $"Erro ao buscar alunos: {ex.Message}", "OK");
+        }
+        finally
+        {
+            IsBusy = false;
+            IsRefreshing = false;
+        }
+    }
+
+    [RelayCommand]
     private async Task LoadAlunosAsync()
     {
         if (IsBusy) return;
@@ -87,7 +162,7 @@ public partial class AlunoListViewModel : BaseViewModel
                 OnPropertyChanged(nameof(Alunos));
             });
 
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             var alunosList = await _alunoService.ObterTodosAsync(cts.Token);
 
             if (alunosList != null)
@@ -132,7 +207,7 @@ public partial class AlunoListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             bool success = await _alunoService.RemoverAsync(aluno.Id, cts.Token);
 
             if (success)

@@ -1,16 +1,21 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿<!-- Francis Miguel Kuhl Schweitzer Junior -->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="AcademiaDoZe.Presentation.AppMaui.Views.AlunoPage"
+             xmlns:converters="clr-namespace:AcademiaDoZe.Presentation.AppMaui.Converters"
              Title="{Binding Title}">
+
+    <ContentPage.Resources>
+        <converters:FotoToImageSourceConverter x:Key="FotoToImageSourceConverter" />
+    </ContentPage.Resources>
 
     <ScrollView Padding="20">
         <VerticalStackLayout Spacing="15">
 
             <!-- Dados Pessoais -->
-            <Border Padding="15" StrokeShape="RoundRectangle 10" BackgroundColor="#1E1E1E">
+            <Border Style="{StaticResource CardBorder}" Padding="15">
                 <VerticalStackLayout Spacing="12">
-                    <Label Text="Dados Pessoais" FontSize="18" FontAttributes="Bold" TextColor="#A855F7" />
+                    <Label Text="Dados Pessoais" FontSize="18" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
 
                     <StackLayout Spacing="5">
                         <Label Text="Nome" />
@@ -51,6 +56,13 @@
                     <!-- Foto -->
                     <StackLayout Spacing="5">
                         <Label Text="Foto" />
+                        <!-- Prévia circular da foto -->
+                        <Border HeightRequest="100" WidthRequest="100" StrokeShape="RoundRectangle 50"
+                                Stroke="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" StrokeThickness="2"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray950}}"
+                                HorizontalOptions="Center" Margin="0,5,0,0">
+                            <Image Source="{Binding Aluno.Foto, Converter={StaticResource FotoToImageSourceConverter}}" Aspect="AspectFill" HeightRequest="100" WidthRequest="100" />
+                        </Border>
                         <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
                             <Button Grid.Column="0" Text="Câmera" Command="{Binding TirarFotoCommand}" BackgroundColor="#6B21A8" TextColor="White" />
                             <Button Grid.Column="1" Text="Galeria" Command="{Binding SelecionarFotoCommand}" BackgroundColor="#374151" TextColor="White" />
@@ -60,9 +72,9 @@
             </Border>
 
             <!-- Endereço -->
-            <Border Padding="15" StrokeShape="RoundRectangle 10" BackgroundColor="#1E1E1E">
+            <Border Style="{StaticResource CardBorder}" Padding="15">
                 <VerticalStackLayout Spacing="12">
-                    <Label Text="Endereço" FontSize="18" FontAttributes="Bold" TextColor="#A855F7" />
+                    <Label Text="Endereço" FontSize="18" FontAttributes="Bold" TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}" />
 
                     <Grid ColumnDefinitions="*, Auto" ColumnSpacing="10">
                         <StackLayout Grid.Column="0" Spacing="5">

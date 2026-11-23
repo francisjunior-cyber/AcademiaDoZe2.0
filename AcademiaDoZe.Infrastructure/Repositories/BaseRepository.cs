@@ -1,4 +1,4 @@
-﻿//Francis Miguel Kuhl Schweitzer junior
+﻿// Francis Miguel Kuhl Schweitzer Junior
 using AcademiaDoZe.Infrastructure.Data;
 using AcademiaDoZe.Infrastructure.Exceptions;
 using System.Data;
@@ -50,8 +50,31 @@ public abstract class BaseRepository : IDisposable, IAsyncDisposable
     }
     protected virtual async Task<DbCommand> CreateCommandAsync(string commandText, CancellationToken cancellationToken = default)
     {
-        var connection = await GetOpenConnectionAsync(cancellationToken);
-        return DbProvider.CreateCommand(commandText, connection);
+        // Cada comando usa uma conexão própria, devolvida ao pool quando o comando é descartado.
+        // Evita conexões vazadas (repositórios criados a cada chamada e nunca descartados), que esgotavam o pool e causavam "Tempo Esgotado".
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        DbConnection connection;
+        try
+        {
+            await DbInitializer.InicializarAsync(_connectionString, _databaseType, cancellationToken);
+            connection = DbProvider.CreateConnection(_connectionString, _databaseType);
+            await connection.OpenAsync(cancellationToken);
+        }
+        catch (DbException ex)
+        {
+            throw new InfrastructureException("FALHA_ABRIR_CONEXAO", "Falha ao abrir conexão com o banco de dados.", ex);
+        }
+        try
+        {
+            var command = DbProvider.CreateCommand(commandText, connection);
+            command.Disposed += (_, _) => connection.Dispose();
+            return command;
+        }
+        catch
+        {
+            connection.Dispose();
+            throw;
+        }
     }
     protected string FormatInsertQuery(string insertSql) => DbProvider.FormatInsertQuery(insertSql, _databaseType);
     protected string GetCurrentDateFunction() => DbProvider.GetCurrentDateFunction(_databaseType);

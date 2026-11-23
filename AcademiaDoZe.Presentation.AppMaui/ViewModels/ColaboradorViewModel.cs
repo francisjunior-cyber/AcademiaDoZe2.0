@@ -1,4 +1,5 @@
-﻿using AcademiaDoZe.Application.DTOs;
+﻿// Francis Miguel Kuhl Schweitzer Junior
+using AcademiaDoZe.Application.DTOs;
 using AcademiaDoZe.Application.Enums;
 using AcademiaDoZe.Application.Interfaces;
 using CommunityToolkit.Mvvm.Input;
@@ -114,7 +115,7 @@ public partial class ColaboradorViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             var colaboradorData = await _colaboradorService.ObterPorIdAsync(ColaboradorId, cts.Token);
 
             if (colaboradorData != null)
@@ -168,7 +169,7 @@ public partial class ColaboradorViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             var colaboradorData = await _colaboradorService.ObterPorCpfAsync(apenasDigitos, cts.Token);
 
             if (colaboradorData != null)
@@ -230,7 +231,7 @@ public partial class ColaboradorViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             var logradouroData = await _logradouroService.ObterPorCepAsync(apenasDigitos, cts.Token);
 
             if (logradouroData != null)
@@ -267,7 +268,7 @@ public partial class ColaboradorViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
 
             if (Colaborador.Endereco != null && Colaborador.Endereco.Id <= 0 && !string.IsNullOrWhiteSpace(Colaborador.Endereco.Cep))
             {

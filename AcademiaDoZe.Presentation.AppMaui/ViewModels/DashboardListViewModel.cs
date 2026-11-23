@@ -1,4 +1,5 @@
-﻿using AcademiaDoZe.Application.Interfaces;
+﻿// Francis Miguel Kuhl Schweitzer Junior
+using AcademiaDoZe.Application.Interfaces;
 using CommunityToolkit.Mvvm.Input;
 
 namespace AcademiaDoZe.Presentation.AppMaui.ViewModels;
@@ -31,6 +32,36 @@ public partial class DashboardListViewModel : BaseViewModel
         Title = "Dashboard";
     }
 
+    // Navega para a listagem correspondente ao clicar no card
+    [RelayCommand]
+    private async Task NavigateAsync(string rota)
+    {
+        if (string.IsNullOrWhiteSpace(rota))
+            return;
+
+        try
+        {
+            await Shell.Current.GoToAsync(rota);
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlertAsync("Erro", $"Erro ao navegar: {ex.Message}", "OK");
+        }
+    }
+
+    // Executa a contagem com fallback seguro: se o serviço falhar ou expirar, retorna 0 sem travar os demais
+    private static async Task<int> ContarAsync(Func<CancellationToken, Task<int>> contar, CancellationToken token)
+    {
+        try
+        {
+            return await contar(token);
+        }
+        catch
+        {
+            return 0;
+        }
+    }
+
     [RelayCommand]
     private async Task LoadDashboardDataAsync()
     {
@@ -40,18 +71,22 @@ public partial class DashboardListViewModel : BaseViewModel
         try
         {
             IsBusy = true;
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
 
-            // Busca apenas os Logradouros para evitar timeout em tabelas inexistentes/serviços não implementados
-            var logradouros = await _logradouroService.ObterTodosAsync();
-            var totalLog = logradouros?.Count() ?? 0;
+            var tLogradouros = ContarAsync(async ct => (await _logradouroService.ObterTodosAsync(ct))?.Count() ?? 0, cts.Token);
+            var tAlunos = ContarAsync(async ct => (await _alunoService.ObterTodosAsync(ct))?.Count() ?? 0, cts.Token);
+            var tColaboradores = ContarAsync(async ct => (await _colaboradorService.ObterTodosAsync(ct))?.Count() ?? 0, cts.Token);
+            var tMatriculas = ContarAsync(async ct => (await _matriculaService.ObterTodasAsync(ct))?.Count() ?? 0, cts.Token);
+
+            var totais = await Task.WhenAll(tLogradouros, tAlunos, tColaboradores, tMatriculas);
 
             // Atualiza as propriedades na thread principal da interface gráfica
             await MainThread.InvokeOnMainThreadAsync(() =>
             {
-                TotalLogradouros = totalLog;
-                TotalAlunos = 0;
-                TotalColaboradores = 0;
-                TotalMatriculas = 0;
+                TotalLogradouros = totais[0];
+                TotalAlunos = totais[1];
+                TotalColaboradores = totais[2];
+                TotalMatriculas = totais[3];
             });
         }
         catch (Exception ex)
@@ -64,4 +99,3 @@ public partial class DashboardListViewModel : BaseViewModel
         }
     }
 }
-

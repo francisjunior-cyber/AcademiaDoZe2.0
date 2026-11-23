@@ -1,4 +1,5 @@
-﻿using AcademiaDoZe.Application.DTOs;
+﻿// Francis Miguel Kuhl Schweitzer Junior
+using AcademiaDoZe.Application.DTOs;
 using AcademiaDoZe.Application.Interfaces;
 using CommunityToolkit.Mvvm.Input;
 
@@ -30,7 +31,7 @@ public partial class LogradouroViewModel : BaseViewModel
         {
             IsEditMode = true;
             Title = "Editar Logradouro";
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             var data = await _logradouroService.ObterPorIdAsync(LogradouroId, cts.Token);
             if (data != null) Logradouro = data;
         }
@@ -50,7 +51,7 @@ public partial class LogradouroViewModel : BaseViewModel
         try
         {
             IsBusy = true;
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
             if (IsEditMode)
                 await _logradouroService.AtualizarAsync(Logradouro, cts.Token);
             else
